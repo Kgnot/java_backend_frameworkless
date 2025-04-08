@@ -1,9 +1,5 @@
 package pd.fin.core;
 
-import com.fasterxml.uuid.Generators;
-
-import java.util.UUID;
-
 public record User(UserId userId, Username username, Password password, FirstName firstName, LastName lastName) {
 
     public User {
@@ -12,17 +8,13 @@ public record User(UserId userId, Username username, Password password, FirstNam
         }
     }
 
-    public record UserId(UUID value) {
-        public static UserId of() {
-            return new UserId(Generators.timeBasedEpochRandomGenerator().generate());
-        }
-
-        public static UserId of(UUID value) {
+    public record UserId(Integer value) {
+        public static UserId of(Integer value) {
             return new UserId(value);
         }
 
         public static UserId of(String value) {
-            return new UserId(UUID.fromString(value));
+            return new UserId(Integer.parseInt(value));
         }
     }
 
@@ -35,7 +27,7 @@ public record User(UserId userId, Username username, Password password, FirstNam
 
     public record Password(String value) {
         public static Password of(String value){
-            if (value == null || value.length() < 8) {
+            if (value == null || value.length() < 5) {
                 throw new IllegalArgumentException("Password must be at least 8 characters long");
             }
             return new Password(value);

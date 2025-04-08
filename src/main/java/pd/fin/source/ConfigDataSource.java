@@ -15,6 +15,7 @@ public class ConfigDataSource {
                     case MYSQL -> createMysqlDataSource();
                     case POSTGRESQL -> createPostgreSQLDataSource();
                     case SQLITE -> createSQLiteDataSource();
+
                 };
     }
 
@@ -35,9 +36,9 @@ public class ConfigDataSource {
 
     public DataSource createPostgreSQLDataSource() {
         var config = new HikariConfig();
-        config.setJdbcUrl("jdbc:postgresql://localhost:5432/mydb");
-        config.setUsername("user");
-        config.setPassword("password");
+        config.setJdbcUrl("jdbc:postgresql://ep-damp-glade-a87tu69i-pooler.eastus2.azure.neon.tech/test?user=test_owner&password=npg_P4vVgE8ULHCB&sslmode=require");
+        config.setUsername("test_owner");
+        config.setPassword("npg_P4vVgE8ULHCB");
         config.setDriverClassName("org.postgresql.Driver");
         config.setMaximumPoolSize(10);
         config.setMinimumIdle(2);

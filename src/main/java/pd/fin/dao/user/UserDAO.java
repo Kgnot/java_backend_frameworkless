@@ -8,13 +8,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-public class UserDAO extends DAO<UserEntity, UUID> {
+public class UserDAO extends DAO<UserEntity, Integer> {
 
-    private ConfigDataSource config;
+    private final ConfigDataSource config;
 
-    protected UserDAO(ConfigDataSource config) {
+    public UserDAO(ConfigDataSource config) {
         super(config);
         this.config = config;
     }
@@ -23,9 +22,9 @@ public class UserDAO extends DAO<UserEntity, UUID> {
     public void create(UserEntity object) {
         var query =
                 """
-             INSERT INTO users (id, username, password, first_name, last_name) VALUES (?, ?, ?, ?, ?);
-            
-            """;
+                         INSERT INTO users (id, username, password, first_name, last_name) VALUES (?, ?, ?, ?, ?);
+                        
+                        """;
         try (var connection = config.getDataSource().getConnection();
              var preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setObject(1, object.id());
@@ -40,18 +39,18 @@ public class UserDAO extends DAO<UserEntity, UUID> {
     }
 
     @Override
-    public Optional<UserEntity> findById(UUID id) {
+    public Optional<UserEntity> findById(Integer id) {
         var query =
                 """
-                        SELECT * from user where id = ?;
-                """;
-        try(var connection = config.getDataSource().getConnection();
-            var preparedStatement = connection.prepareStatement(query)) {
+                                SELECT * from users where id = ?;
+                        """;
+        try (var connection = config.getDataSource().getConnection();
+             var preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setObject(1, id);
             var resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 var user = new UserEntity(
-                        (UUID) resultSet.getObject("id"),
+                        resultSet.getInt("id"),
                         resultSet.getString("username"),
                         resultSet.getString("password"),
                         resultSet.getString("first_name"),
@@ -59,26 +58,25 @@ public class UserDAO extends DAO<UserEntity, UUID> {
                 );
                 return Optional.of(user);
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
+        return Optional.empty();
     }
 
     @Override
     public List<UserEntity> findAll() {
         var query =
                 """
-                        SELECT * from user;
-                """;
-        try(var connection = config.getDataSource().getConnection();
-            var preparedStatement = connection.prepareStatement(query)) {
+                                SELECT * from users;
+                        """;
+        try (var connection = config.getDataSource().getConnection();
+             var preparedStatement = connection.prepareStatement(query)) {
             var resultSet = preparedStatement.executeQuery();
             var users = new ArrayList<UserEntity>();
             while (resultSet.next()) {
                 var user = new UserEntity(
-                        (UUID) resultSet.getObject("id"),
+                        resultSet.getInt("id"),
                         resultSet.getString("username"),
                         resultSet.getString("password"),
                         resultSet.getString("first_name"),
@@ -87,10 +85,8 @@ public class UserDAO extends DAO<UserEntity, UUID> {
                 users.add(user);
             }
             return users;
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
 }
